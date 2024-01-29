@@ -1,25 +1,37 @@
 "use client"
-import dynamic from 'next/dynamic';
-import { useAuth } from '@/lib/authcontext';
 import { useState } from 'react';
-
-const DynamicUseRouter = dynamic(() => import('next/router'), { ssr: false });
+import axios, { AxiosError } from 'axios';
 
 const LoginPage = () => {
-  const router = DynamicUseRouter();
-  const { signin } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [token, setToken] = useState(null); // Nuevo estado para almacenar el token
 
   const handleLogin = async () => {
     try {
-      await signin({ email, password }, (redirectPath) => {
-        router.push(redirectPath);
+      const response = await axios.post('http://localhost:4000/user/login', {
+        email: email,
+        password: password,
       });
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error.response?.data?.message || 'Error desconocido');
+
+      // Almacenar el token en el estado
+      setToken(response.data.token);
+
+      // Manejar la respuesta según sea necesario
+      console.log('Inicio de sesión exitoso', response.data);
+
+      // Redirigir al usuario según las credenciales
+      if (email === 'admin@example.com' && password === 'adminPassword') {
+        window.location.href = '/admin'; 
+      } else {
+        window.location.href = '/'; // Redirige a la página principal
+      }
+
+    } catch (error: AxiosError) {
+      console.error('Inicio de sesión fallido', error.response?.data);
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center h-screen">
