@@ -1,53 +1,49 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:4000'); 
+const socket = io('http://localhost:4000');
 
-const Contacto: React.FC = () => {
-  const [nombreRepartidor, setNombreRepartidor] = useState('Nombre del Repartidor');
+const ContactoUsuario: React.FC = () => {
+  const [nombreRepartidor, setNombreRepartidor] = useState('Usuario');
   const [numeroRepartidor, setNumeroRepartidor] = useState('123456789');
-  const [mensajes, setMensajes] = useState<{ id: string; mensaje: string }[]>([]);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const [mensajes, setMensajes] = useState([]);
 
   const enviarMensaje = () => {
     if (nuevoMensaje.trim() !== '') {
       console.log(`Enviando mensaje: ${nuevoMensaje}`);
-      socket.emit('mensaje', nuevoMensaje);
+
+      // Modificado para enviar mensajes privados al admin
+      const selectUser = 'admin';
+      socket.emit('sendMessagesPrivate', { selectUser, message: nuevoMensaje });
+
+      // Actualizar el estado para mostrar el mensaje enviado
+      setMensajes([...mensajes, { user: 'Usuario', message: nuevoMensaje }]);
+
       setNuevoMensaje('');
     }
   };
 
   useEffect(() => {
-    console.log('Conectando al servidor...');
-  
-    socket.on('connect', () => {
-      console.log(`Conectado al servidor: ${socket.id}`);
+    // Manejar mensajes privados recibidos
+    socket.on('sendMessage', ({ user, message }) => {
+      console.log(`Mensaje recibido de ${user}: ${message}`);
+      // Actualizar el estado para mostrar el mensaje recibido
+      setMensajes([...mensajes, { user, message }]);
     });
-  
-    // Escucha el evento 'mensaje' y muestra el mensaje en el div de mensajes
-    socket.on('mensaje', (data) => {
-      console.log(`Mensaje recibido de ${data.id}: ${data.mensaje}`);
-      setMensajes((prevMensajes) => [...prevMensajes, data]);
-      scrollToBottom();
-    });
-  
-    return () => {
-      socket.off('mensaje');
-      console.log('Desconectado del servidor');
-    };
-  }, []);
-  
 
-  useEffect(() => {
-    scrollToBottom();
+    // Actualizar la lista de usuarios activos
+    socket.on('activeSessions', (users) => {
+      console.log('Lista de usuarios activos:', users);
+      // Puedes realizar acciones según tus necesidades
+    });
+
+    // Limpiar suscripciones al desmontar el componente
+    return () => {
+      socket.off('sendMessage');
+      socket.off('activeSessions');
+    };
   }, [mensajes]);
 
   return (
@@ -58,19 +54,13 @@ const Contacto: React.FC = () => {
       </div>
 
       <div className="flex-1 p-4 overflow-y-auto">
-  {mensajes.map((mensaje, index) => (
-    <div
-      key={index}
-      className={`${
-        mensaje.id === socket.id ? 'self-end' : 'self-start'
-      } bg-blue-500 text-white p-2 rounded-md mb-2 max-w-2/3`}
-    >
-      {mensaje.mensaje}
-    </div>
-  ))}
-  <div ref={messagesEndRef} />
-</div>
-
+        {/* Mostrar los mensajes */}
+        {mensajes.map((mensaje, index) => (
+          <div key={index} className="mb-2">
+            <strong>{mensaje.user}:</strong> {mensaje.message}
+          </div>
+        ))}
+      </div>
 
       <div className="p-4 bg-gray-200">
         <input
@@ -88,4 +78,4 @@ const Contacto: React.FC = () => {
   );
 };
 
-export default Contacto; 
+export default ContactoUsuario;

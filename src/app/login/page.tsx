@@ -1,38 +1,38 @@
 "use client"
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import { useAuth } from '@/context/datacontext.js';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [token, setToken] = useState(null); // Nuevo estado para almacenar el token
+  const { signin } = useAuth(); // Obtén las funciones y estados del contexto
 
+ 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:4000/user/login', {
-        email: email,
-        password: password,
-      });
-
-      // Almacenar el token en el estado
-      setToken(response.data.token);
-
-      // Manejar la respuesta según sea necesario
-      console.log('Inicio de sesión exitoso', response.data);
-
-      // Redirigir al usuario según las credenciales
-      if (email === 'admin@example.com' && password === 'adminPassword') {
-        window.location.href = '/admin'; 
-      } else {
-        window.location.href = '/'; // Redirige a la página principal
+      // Verificar si ambos campos están llenos
+      if (!email || !password) {
+        console.log("Por favor, completa todos los campos.");
+        return;
       }
 
-    } catch (error: AxiosError) {
-      console.error('Inicio de sesión fallido', error.response?.data);
+      // Llamar a la función de inicio de sesión
+      await signin({ email, password });
+
+        // Redirigir al usuario según las credenciales
+        if (email === 'admin@example.com' && password === 'adminPassword') {
+          window.location.href = '/admin'; 
+        } else {
+          window.location.href = '/'; // Redirige a la página principal
+        }
+
+    } catch (error) {
+      console.log("Error al iniciar sesión:", error.message);
+      // Puedes manejar el error y mostrar un mensaje apropiado al usuario si es necesario
     }
   };
-  
 
+  
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="w-96">
