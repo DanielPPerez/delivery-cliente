@@ -15,29 +15,11 @@ const links = [
 const Menu = () => {
   const [open, setOpen] = useState(false);
 
-  // TEMPORARY
+
   const user = false;
   return (
     <div>
-      {/* LONG WAY */}
-      {/* {!open ? (
-        <Image
-          src="/open.png"
-          alt=""
-          width={20}
-          height={20}
-          onClick={() => setOpen(true)}
-        />
-      ) : (
-        <Image
-          src="/close.png"
-          alt=""
-          width={20}
-          height={20}
-          onClick={() => setOpen(false)}
-        />
-      )} */}
-      
+
       {/* SHORTCUT */}
       <Image
         src={open ? "/close.png" : "/open.png"}
@@ -55,18 +37,7 @@ const Menu = () => {
             </Link>
           ))}
 
-          {/* LONG WAY */}
-          {/* {!user ? (
-            <Link href="/login" onClick={() => setOpen(false)}>
-              Login
-            </Link>
-          ) : (
-            <Link href="/orders" onClick={() => setOpen(false)}>
-              Orders
-            </Link>
-          )} */}
 
-          {/* SHORTCUT */}
           <Link
             href={user ? "/orders" : "login"}
             onClick={() => setOpen(false)}

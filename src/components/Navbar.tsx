@@ -3,6 +3,7 @@ import Menu from "./Menu";
 import Link from "next/link";
 import CartIcon from "./CartIcon";
 import Image from "next/image";
+import Contacto from "../app/Contacto/page";
 
 const Navbar = () => {
   const user = false;
@@ -10,9 +11,9 @@ const Navbar = () => {
     <div className="h-12 text-red-500 p-4 flex items-center justify-between border-b-2 border-b-red-500 uppercase md:h-24 lg:px-20 xl:px-40">
       {/* LEFT LINKS */}
       <div className="hidden md:flex gap-4 flex-1">
-        <Link href="/">Homepage</Link>
+        <Link href="/">Inicio</Link>
         <Link href="/menu">Menu</Link>
-        <Link href="/">Contact</Link>
+        <Link href="/Contacto">Contactanos</Link>
       </div>
       {/* LOGO */}
       <div className="text-xl md:font-bold flex-1 md:text-center">
@@ -29,7 +30,7 @@ const Navbar = () => {
           <span>123 456 78</span>
         </div>
         {!user ? (
-          <Link href="/login">Login</Link>
+           <Link href="/login">Login</Link>
         ) : (
           <Link href="/orders">Orders</Link>
         )}

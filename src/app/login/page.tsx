@@ -1,44 +1,67 @@
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+"use client"
+import dynamic from 'next/dynamic';
+import { useAuth } from '@/lib/authcontext';
+import { useState } from 'react';
+
+const DynamicUseRouter = dynamic(() => import('next/router'), { ssr: false });
 
 const LoginPage = () => {
+  const router = DynamicUseRouter();
+  const { signin } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      await signin({ email, password }, (redirectPath) => {
+        router.push(redirectPath);
+      });
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error.response?.data?.message || 'Error desconocido');
+    }
+  };
+
   return (
-    <div className="p-4 h-[calc(100vh-6rem)] md:h-[calc(100vh-9rem)] flex items-center justify-center">
-      {/* BOX */}
-      <div className=" h-full shadow-2xl rounded-md flex flex-col md:flex-row md:h-[70%] md:w-full lg:w-[60%] 2xl:w-1/2">
-        {/* IMAGE CONTAINER */}
-        <div className="relative h-1/3 w-full md:h-full md:w-1/2">
-          <Image src="/loginBg.png" alt="" fill className="object-cover"/>
-        </div>
-        {/* FORM CONTAINER */}
-        <div className="p-10 flex flex-col gap-8 md:w-1/2">
-          <h1 className="font-bold text-xl xl:text-3xl">Welcome</h1>
-          <p>Log into your account or create a new one using social buttons</p>
-          <button className="flex gap-4 p-4 ring-1 ring-orange-100 rounded-md">
-            <Image
-              src="/google.png"
-              alt=""
-              width={20}
-              height={20}
-              className="object-contain"
+    <div className="flex items-center justify-center h-screen">
+      <div className="w-96">
+        <h1 className="text-3xl font-bold mb-4">Iniciar Sesión</h1>
+        <form className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 p-2 w-full border rounded-md"
             />
-            <span>Sign in with Google</span>
-          </button>
-          <button className="flex gap-4 p-4 ring-1 ring-blue-100 rounded-md">
-            <Image
-              src="/facebook.png"
-              alt=""
-              width={20}
-              height={20}
-              className="object-contain"
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-600">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 p-2 w-full border rounded-md"
             />
-            <span>Sign in with Facebook</span>
-          </button>
-          <p className="text-sm">
-            Have a problem?<Link className="underline" href="/"> Contact us</Link>
-          </p>
-        </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={handleLogin}
+              className="w-full bg-blue-500 text-white p-2 rounded-md"
+            >
+              Iniciar Sesión
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

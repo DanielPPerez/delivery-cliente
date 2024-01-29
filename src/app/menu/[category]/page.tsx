@@ -22,7 +22,7 @@ const CategoryPage = () => {
           </div>
         </Link>
       ))}
-    </div>
+    </div>    
   );
 };
 

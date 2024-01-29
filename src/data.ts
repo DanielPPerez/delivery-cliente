@@ -4,6 +4,7 @@ type Product = {
   desc?: string;
   img?: string;
   price: number;
+  quantity: number, 
   options?: { title: string; additionalPrice: number }[];
 };
 
@@ -30,6 +31,7 @@ export const featuredProducts: Products = [
         additionalPrice: 6,
       },
     ],
+    quantity: 10, 
   },
   {
     id: 2,
@@ -51,6 +53,7 @@ export const featuredProducts: Products = [
         additionalPrice: 6,
       },
     ],
+    quantity: 10, 
   },
   {
     id: 3,
@@ -72,6 +75,7 @@ export const featuredProducts: Products = [
         additionalPrice: 6,
       },
     ],
+    quantity: 10, 
   },
   {
     id: 4,
@@ -93,6 +97,7 @@ export const featuredProducts: Products = [
         additionalPrice: 6,
       },
     ],
+    quantity: 10, 
   },
   {
     id: 5,
@@ -113,7 +118,7 @@ export const featuredProducts: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 6,
@@ -134,7 +139,7 @@ export const featuredProducts: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 7,
@@ -155,7 +160,7 @@ export const featuredProducts: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 8,
@@ -176,7 +181,7 @@ export const featuredProducts: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 9,
@@ -197,7 +202,7 @@ export const featuredProducts: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
 ];
 
@@ -224,7 +229,7 @@ export const pizzas: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 2,
@@ -245,7 +250,7 @@ export const pizzas: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 3,
@@ -266,7 +271,7 @@ export const pizzas: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 4,
@@ -287,7 +292,7 @@ export const pizzas: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 5,
@@ -308,7 +313,7 @@ export const pizzas: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
   {
     id: 6,
@@ -329,7 +334,7 @@ export const pizzas: Products = [
         title: "Large",
         additionalPrice: 6,
       },
-    ],
+    ],quantity: 10, 
   },
 ];
 
@@ -352,7 +357,7 @@ export const singleProduct: Product = {
       title: "Large",
       additionalPrice: 6,
     },
-  ],
+  ],quantity: 10, 
 };
 
 
@@ -391,3 +396,4 @@ export const menu: Menu = [
     color: "white",
   },
 ];
+
