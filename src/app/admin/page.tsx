@@ -1,10 +1,11 @@
+// ChatAdmin.tsx
 "use client"
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:4000');
 
-const ContactoAdmin: React.FC = () => {
+const ChatAdmin: React.FC = () => {
   const [nombreRepartidor, setNombreRepartidor] = useState('Admin');
   const [numeroRepartidor, setNumeroRepartidor] = useState('Admin');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
@@ -13,33 +14,23 @@ const ContactoAdmin: React.FC = () => {
   const enviarMensaje = () => {
     if (nuevoMensaje.trim() !== '') {
       console.log(`Enviando mensaje: ${nuevoMensaje}`);
-
-      // Modificado para enviar mensajes privados al usuario
       const selectUser = 'usuario';
       socket.emit('sendMessagesPrivate', { selectUser, message: nuevoMensaje });
-
-      // Actualizar el estado para mostrar el mensaje enviado
       setMensajes([...mensajes, { user: 'Admin', message: nuevoMensaje }]);
-
       setNuevoMensaje('');
     }
   };
 
   useEffect(() => {
-    // Manejar mensajes privados recibidos
     socket.on('sendMessage', ({ user, message }) => {
       console.log(`Mensaje recibido de ${user}: ${message}`);
-      // Actualizar el estado para mostrar el mensaje recibido
       setMensajes([...mensajes, { user, message }]);
     });
 
-    // Actualizar la lista de usuarios activos
     socket.on('activeSessions', (users) => {
       console.log('Lista de usuarios activos:', users);
-      // Puedes realizar acciones según tus necesidades
     });
 
-    // Limpiar suscripciones al desmontar el componente
     return () => {
       socket.off('sendMessage');
       socket.off('activeSessions');
@@ -54,7 +45,6 @@ const ContactoAdmin: React.FC = () => {
       </div>
 
       <div className="flex-1 p-4 overflow-y-auto">
-        {/* Mostrar los mensajes */}
         {mensajes.map((mensaje, index) => (
           <div key={index} className="mb-2">
             <strong>{mensaje.user}:</strong> {mensaje.message}
@@ -78,4 +68,4 @@ const ContactoAdmin: React.FC = () => {
   );
 };
 
-export default ContactoAdmin;
+export default ChatAdmin;

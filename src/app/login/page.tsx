@@ -1,36 +1,40 @@
 "use client"
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/datacontext.js';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signin } = useAuth(); // Obtén las funciones y estados del contexto
+  const { signin, isAuthenticated } = useAuth();
+  const [errorMessage, setErrorMessage] = useState('');
 
- 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    const userData = {
+      email,
+      password,
+    };
+
     try {
-      // Verificar si ambos campos están llenos
-      if (!email || !password) {
-        console.log("Por favor, completa todos los campos.");
-        return;
-      }
+      const { success, isAdmin } = await signin(userData);
 
-      // Llamar a la función de inicio de sesión
-      await signin({ email, password });
-
-        // Redirigir al usuario según las credenciales
-        if (email === 'admin@example.com' && password === 'adminPassword') {
-          window.location.href = '/admin'; 
+      if (success) {
+        // Realiza la redirección directamente utilizando window.location.replace
+        if (isAdmin) {
+          window.location.replace("/admin");
         } else {
-          window.location.href = '/'; // Redirige a la página principal
+          window.location.replace("/");
         }
-
+      } else {
+        setErrorMessage('Error al iniciar sesión');
+      }
     } catch (error) {
-      console.log("Error al iniciar sesión:", error.message);
-      // Puedes manejar el error y mostrar un mensaje apropiado al usuario si es necesario
+      setErrorMessage('Error al iniciar sesión');
+      console.error(error);
     }
   };
+ 
 
   
   return (

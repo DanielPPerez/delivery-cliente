@@ -1,40 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 
-const baseURL = 'http://localhost:4000/user';
+const API = "http://localhost:4000/user";
 
-export const registerRequest = async (userData) => {
-  try {
-    const response = await axios.post(`${baseURL}/register`, userData);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+export const registerRequest = (user) =>
+  axios.post(`${API}/register`, user);
 
-export const loginRequest = async (userData) => {
-  try {
-    const response = await axios.post(`${baseURL}/login`, userData);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+export const loginRequest = (user) =>
+  axios.post(`${API}/login`, user);
 
-export const verifyTokenRequest = async (token) => {
-  try {
-    const response = await axios.post(`${baseURL}/verifyToken`, { token });
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const logoutRequest = async () => {
-  try {
-  
-    const response = await axios.post(`${baseURL}/logout`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+export const verifyTokenRequest = (user) =>
+  axios.post(`${API}/verify`, user);

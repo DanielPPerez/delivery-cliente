@@ -16,6 +16,8 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
 
   // Limpiar errores después de 5 segundos
   useEffect(() => {
@@ -41,20 +43,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signin = async (user) => {
+  const signin = async (userData) => {
     try {
-      const res = await loginRequest(user);
-  
-  
-      setUser(res.data);
-      setIsAuthenticated(true);
-  
-      // Puedes agregar una lógica de redirección aquí si es necesario
+      const response = await loginRequest(userData);
+
+      if (response.data.token) {
+        const token = response.data.token;
+        const isAdmin = response.data.isAdmin;
+
+        Cookies.set("token", token);
+        setUser({ ...response.data.user, email: userData.email });
+        setIsAuthenticated(true);
+        setErrors([]);
+
+        // Retorna información sobre el éxito del inicio de sesión y si el usuario es un administrador
+        return { success: true, isAdmin };
+      } else {
+        setErrorMessage("Error al iniciar sesión. Por favor, verifica tus credenciales.");
+        // Retorna información sobre el fallo del inicio de sesión
+        return { success: false };
+      }
     } catch (error) {
-      console.log("Error en la autenticación:", error.message);
-      // Puedes setear errores y manejarlos en tu interfaz de usuario si es necesario
+      console.error("Error al realizar la solicitud:", error);
+      setErrorMessage("Error al procesar la solicitud. Por favor, intenta nuevamente más tarde.");
+      // Retorna información sobre el fallo del inicio de sesión
+      return { success: false };
     }
   };
+  
 
   const logout = () => {
     Cookies.remove("token");
