@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "./toaster.js"
 import { AuthProvider } from "../context/datacontext.js";
-
+import {CartProvider} from "../context/cartcontext.js"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,9 +25,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <div>
        <AuthProvider>
+        <CartProvider>
           <Navbar />
           {children}
           <Footer />
+          </CartProvider>
           </AuthProvider>
           <Toaster />
         </div>
