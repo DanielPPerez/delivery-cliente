@@ -28,6 +28,15 @@ const FormularioSubirProducto: React.FC = () => {
       const response = await axios.post('http://localhost:4000/user/crearproducto', formData);
 
       if (response.status === 201) {
+        // Limpiar los campos después de una subida exitosa
+        setNuevoProducto({
+          title: '',
+          desc: '',
+          price: 0,
+          quantity: 0,
+          img: null,
+        });
+  
         // Handle success
         console.log('Producto subido exitosamente');
       } else {

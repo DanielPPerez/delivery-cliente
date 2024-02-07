@@ -1,22 +1,27 @@
 "use client"
-import { useEffect, createContext, useContext, useState } from "react";
-import { loginRequest, registerRequest, verifyTokenRequest } from "../api/requets.js";
-import Cookies from "js-cookie";
+import { useEffect, createContext, useContext, useState } from 'react';
+import { loginRequest, registerRequest, verifyTokenRequest } from '../api/requets.js';
+import Cookies from 'js-cookie';
+
+
+
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
 export const AuthProvider = ({ children }) => {
+  const [redirectPath, setRedirectPath] = useState(null);
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
+
 
 
   // Limpiar errores después de 5 segundos
@@ -50,18 +55,14 @@ export const AuthProvider = ({ children }) => {
       if (response.data.token) {
         const token = response.data.token;
         const isAdmin = response.data.isAdmin;
+        const path = response.data.redirectPath;
 
         Cookies.set("token", token);
         setUser({ ...response.data.user, email: userData.email });
         setIsAuthenticated(true);
         setErrors([]);
 
-        // Retorna información sobre el éxito del inicio de sesión y si el usuario es un administrador
-        return { success: true, isAdmin };
-      } else {
-        setErrorMessage("Error al iniciar sesión. Por favor, verifica tus credenciales.");
-        // Retorna información sobre el fallo del inicio de sesión
-        return { success: false };
+     
       }
     } catch (error) {
       console.error("Error al realizar la solicitud:", error);
@@ -70,13 +71,18 @@ export const AuthProvider = ({ children }) => {
       return { success: false };
     }
   };
-  
+
+ 
+  useEffect(() => {
+    if (redirectPath) {
+      window.location.href = redirectPath;
+    }
+  }, [redirectPath]);
 
   const logout = () => {
     Cookies.remove("token");
     setUser(null);
     setIsAuthenticated(false);
-    
   };
 
   useEffect(() => {
@@ -85,6 +91,7 @@ export const AuthProvider = ({ children }) => {
       if (!cookies.token) {
         setIsAuthenticated(false);
         setLoading(false);
+        setUserLoaded(true); // Marca la información del usuario como cargada incluso si no hay token
         return;
       }
 
@@ -94,10 +101,13 @@ export const AuthProvider = ({ children }) => {
         if (!res.data) return setIsAuthenticated(false);
         setIsAuthenticated(true);
         setUser(res.data);
+        setUserEmail(res.data.email);
         setLoading(false);
+        setUserLoaded(true); // Marca la información del usuario como cargada
       } catch (error) {
         setIsAuthenticated(false);
         setLoading(false);
+        setUserLoaded(true); // Marca la información del usuario como cargada
       }
     };
     checkLogin();
@@ -112,6 +122,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         isAuthenticated,
         errors,
+        
         loading,
       }}
     >
