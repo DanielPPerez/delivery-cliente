@@ -3,9 +3,6 @@ import { useEffect, createContext, useContext, useState } from 'react';
 import { loginRequest, registerRequest, verifyTokenRequest } from '../api/requets.js';
 import Cookies from 'js-cookie';
 
-
-
-
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -21,6 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [userToken, setUserToken] = useState(null);
 
 
 
@@ -51,18 +49,22 @@ export const AuthProvider = ({ children }) => {
   const signin = async (userData) => {
     try {
       const response = await loginRequest(userData);
-
+  
       if (response.data.token) {
         const token = response.data.token;
         const isAdmin = response.data.isAdmin;
-        const path = response.data.redirectPath;
-
+        
+  
+        // Almacenar el token en las cookies
         Cookies.set("token", token);
-        setUser({ ...response.data.user, email: userData.email });
+  
+        // Configurar el estado del usuario autenticado y la propiedad isAdmin
+        setUser({ ...response.data.user, email: userData.email, isAdmin });
+        setUserToken(token);
+        
+
         setIsAuthenticated(true);
         setErrors([]);
-
-     
       }
     } catch (error) {
       console.error("Error al realizar la solicitud:", error);
@@ -71,6 +73,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false };
     }
   };
+  
 
  
   useEffect(() => {
@@ -122,7 +125,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         isAuthenticated,
         errors,
-        
+        userToken,
         loading,
       }}
     >

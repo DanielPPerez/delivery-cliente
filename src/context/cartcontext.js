@@ -21,7 +21,7 @@ export const CartProvider = ({ children }) => {
   const calculateTotal = () => {
     const serviceCost = 50;
 
-    if (cart.length > 3) {
+    if (cart.length > 2) {
       // Si hay más de 3 productos, el costo de envío es gratis
       return calculateSubtotal();
     } else {

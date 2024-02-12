@@ -3,35 +3,75 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { useCart } from "../../context/cartcontext.js";
+import { useAuth } from "@/context/datacontext.js";
 
 const CartPage = () => {
   const { cart, removeFromCart, calculateSubtotal, calculateTotal, isServiceFree } = useCart();
+  const { userToken, user } = useAuth();
   const [alert, setAlert] = useState(null);
+  const [newOrderNotification, setNewOrderNotification] = useState(null);
 
   useEffect(() => {
-    if (alert) {
-      // Ocultar la notificación después de 5 segundos
-      const timer = setTimeout(() => {
-        setAlert(null);
-      }, 5000);
-
-      return () => clearTimeout(timer);
+    // Mostrar la notificación de nuevo pedido
+    if (newOrderNotification) {
+      // Verificar si la notificación tiene el formato esperado
+      if (newOrderNotification.numeroPedido) {
+        setAlert({
+          type: "success",
+          message: `Nuevo pedido disponible. Número de pedido: ${newOrderNotification.numeroPedido}`,
+        });
+      } else {
+        // Manejar el caso en el que la estructura de la notificación no es la esperada
+        console.error('Estructura de notificación no válida:', newOrderNotification);
+        setAlert({
+          type: "error",
+          message: "Error en la notificación de nuevos pedidos. Inténtalo de nuevo.",
+        });
+      }
+  
+      // Limpiar la notificación de nuevo pedido después de mostrarla
+      setNewOrderNotification(null);
     }
-  }, [alert]);
+  }, [newOrderNotification]);
+
+  const closeNotification = () => {
+    // Cerrar manualmente la notificación
+    setAlert(null);
+  };
 
   const handleCheckout = async () => {
     try {
-      const userEmail = "pizza22@gmail.com";
+      // Verificar si el usuario está autenticado
+      if (!userToken) {
+        setAlert({
+          type: "error",
+          message: "Debes iniciar sesión para realizar un pedido.",
+        });
+        return;
+      }
+
       const detallesVenta = cart.map((item) => ({
-        title: item.title,
+        name: item.title,
         quantity: item.quantity,
       }));
 
-      // Enviar la información al servidor
-      const response = await axios.post("http://localhost:4000/user/crearpedido", { userEmail, detallesVenta });
+      const response = await axios.post("http://localhost:4000/user/crearpedido", {
+        userToken,
+        detallesVenta,
+        userEmail: user.email,
+      });
 
-      // Realizar una solicitud para notificación de nuevos pedidos
-      await axios.get("http://localhost:4000/notifications");
+      const notificationResponse = await axios.get("http://localhost:4000/notifications/wait");
+
+      if (notificationResponse.data && notificationResponse.data.numeroPedido) {
+        setNewOrderNotification(notificationResponse.data);
+      } else {
+        console.error('Estructura de notificación no válida:', notificationResponse.data);
+        setAlert({
+          type: "error",
+          message: "Error al obtener la notificación de nuevos pedidos. Inténtalo de nuevo.",
+        });
+      }
 
       // Mostrar la notificación de éxito
       setAlert({
@@ -39,10 +79,8 @@ const CartPage = () => {
         message: `Pedido realizado con éxito. Número de pedido: ${response.data.numeroPedido}`,
       });
 
-      // Realizar alguna acción después de realizar el pedido (redirección, limpiar carrito, etc.)
       console.log("Pedido realizado con éxito:", response.data);
     } catch (error) {
-      // Mostrar la notificación de error
       setAlert({
         type: "error",
         message: "Error al realizar el pedido. Por favor, inténtalo de nuevo.",
@@ -51,23 +89,6 @@ const CartPage = () => {
       console.error("Error al realizar el pedido:", error);
     }
   };
-
-  // Long polling para recibir notificaciones de nuevos pedidos
-  useEffect(() => {
-    const checkNotifications = async () => {
-      try {
-        const response = await axios.get("http://localhost:4000/notifications");
-        if (response.data.alert) {
-          setAlert(response.data.alert);
-        }
-        checkNotifications(); // Realizar la próxima solicitud
-      } catch (error) {
-        // Manejar errores
-      }
-    };
-
-    checkNotifications(); // Iniciar el long polling al montar el componente
-  }, [setAlert]);
 
   return (
     <div className="h-[calc(100vh-6rem)] md:h-[calc(100vh-9rem)] flex flex-col text-red-500 lg:flex-row">
@@ -115,13 +136,18 @@ const CartPage = () => {
         <button className="bg-red-500 text-white p-3 rounded-md w-1/2 self-end" onClick={handleCheckout}>
           CHECKOUT
         </button>
-        {/* ALERT CONTAINER */}
-{alert && (
-  <div className={`mt-4 p-4 bg-${alert.type === "success" ? "green" : "red"}-200 text-${alert.type === "success" ? "green" : "red"}-700`}>
-    {alert.message}
-  </div>
-)}
       </div>
+      {/* NOTIFICATION CONTAINER */}
+      {alert && (
+        <div className={`fixed bottom-4 left-4 right-4 bg-${alert.type}-200 text-${alert.type}-800 p-2 rounded-md`}>
+          <div className="flex justify-between items-center">
+            <span>{alert.message}</span>
+            <button onClick={closeNotification} className="text-sm font-bold focus:outline-none">
+              X
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

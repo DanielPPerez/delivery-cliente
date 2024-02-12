@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/datacontext.js';
 
+
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { signin, isAuthenticated, user } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,21 +22,14 @@ const LoginPage = () => {
       // Llama a tu función de autenticación (signin) y espera a que se complete
       await signin(userData);
 
-      // Verifica si el usuario es administrador
-      if (isAuthenticated && user.isAdmin) {
-        // Redirige al panel de administrador
-        window.location.href = '/admin';
-      } else {
-        // Redirige a la página principal del usuario común
-        window.location.href = '/';
-      }
+      
 
     } catch (error) {
       setErrorMessage('Error al iniciar sesión. Por favor, intenta nuevamente más tarde.');
       console.error(error);
     }
   };
-  
+
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="w-96">

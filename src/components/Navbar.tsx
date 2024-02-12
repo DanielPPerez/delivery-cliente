@@ -1,5 +1,5 @@
 "use client"
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CartIcon from "./CartIcon";
 import Image from "next/image";
@@ -7,6 +7,16 @@ import { useAuth } from "@/context/datacontext.js";
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
+  const [forceRender, setForceRender] = useState(0);
+
+  // Renderizar el componente cada 5 minutos (300,000 milisegundos)
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setForceRender((prev) => prev + 1);
+    }, 3000);
+
+    return () => clearInterval(intervalId); // Limpieza del intervalo al desmontar el componente
+  }, []);
 
   return (
     <nav className="h-12 text-red-500 p-4 flex items-center justify-between border-b-2 border-b-red-500 uppercase md:h-24 lg:px-20 xl:px-40">
