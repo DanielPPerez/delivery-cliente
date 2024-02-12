@@ -73,23 +73,22 @@ const CartPage = () => {
         });
       }
 
-      // Mostrar la notificación de éxito
-      setAlert({
-        type: "success",
-        message: `Pedido realizado con éxito. Número de pedido: ${response.data.numeroPedido}`,
-      });
+     // Mostrar la notificación de éxito
+     setAlert({
+      type: "success",
+      message: `Pedido realizado con éxito. Número de pedido: ${response.data.numeroPedido}`,
+    });
 
-      console.log("Pedido realizado con éxito:", response.data);
-    } catch (error) {
-      setAlert({
-        type: "error",
-        message: "Error al realizar el pedido. Por favor, inténtalo de nuevo.",
-      });
+    console.log("Pedido realizado con éxito:", response.data);
+  } catch (error) {
+    setAlert({
+      type: "error",
+      message: "Error al realizar el pedido. Por favor, inténtalo de nuevo.",
+    });
 
-      console.error("Error al realizar el pedido:", error);
-    }
-  };
-
+    console.error("Error al realizar el pedido:", error);
+  }
+};
   return (
     <div className="h-[calc(100vh-6rem)] md:h-[calc(100vh-9rem)] flex flex-col text-red-500 lg:flex-row">
       {/* PRODUCTS CONTAINER */}
@@ -137,18 +136,18 @@ const CartPage = () => {
           CHECKOUT
         </button>
       </div>
-      {/* NOTIFICATION CONTAINER */}
-      {alert && (
-        <div className={`fixed bottom-4 left-4 right-4 bg-${alert.type}-200 text-${alert.type}-800 p-2 rounded-md`}>
-          <div className="flex justify-between items-center">
-            <span>{alert.message}</span>
-            <button onClick={closeNotification} className="text-sm font-bold focus:outline-none">
-              X
-            </button>
-          </div>
+       {/* NOTIFICATION CONTAINER */}
+    {alert && (
+      <div className={`fixed bottom-4 left-4 right-4 bg-${alert.type}-200 text-${alert.type}-800 p-2 rounded-md`}>
+        <div className="flex justify-between items-center">
+          <span>{alert.message}</span>
+          <button onClick={closeNotification} className="text-sm font-bold focus:outline-none">
+            X
+          </button>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+  </div>
   );
 };
 

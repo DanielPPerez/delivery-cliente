@@ -39,12 +39,20 @@ const Navbar = () => {
         {isAuthenticated ? (
           <>
             <span className="text-white bg-red-500 px-3 py-1 rounded-md">{user.email}</span>
+            {user.email === "admin@example.com" && (
+              <Link href="/admin/pedidos">
+                Pedidos
+              </Link>
+            )}
             <button onClick={() => logout()} className="bg-red-500 text-white px-3 py-1 rounded-md">
               Logout
             </button>
           </>
         ) : (
-          <Link href="/login">Login</Link>
+          <>
+            <Link href="/login">Login</Link>
+            <Link href="/login/register">Registro</Link>
+          </>
         )}
         <CartIcon />
       </div>
@@ -53,3 +61,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

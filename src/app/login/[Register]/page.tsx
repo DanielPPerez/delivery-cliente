@@ -3,35 +3,26 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/datacontext.js';
 import Link from 'next/link';
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signin, isAuthenticated, user } = useAuth();
+  const [telefono, setTelefono] = useState('');
+  const { signup, isAuthenticated, user } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     const userData = {
       email,
       password,
+      telefono,
     };
 
     try {
-      await signin(userData);
+      await signup(userData);
     } catch (error) {
-      if (error.response && error.response.data) {
-        // Si la respuesta contiene datos, asumimos que es un error personalizado del servidor
-        setErrorMessage(error.response.data.message);
-      } else {
-        // De lo contrario, mostramos un mensaje genérico
-        setErrorMessage('Error al iniciar sesión. Por favor, intenta nuevamente más tarde.');
-      }
-
-      // Mostrar el mensaje de error en la alerta
-      setShowAlert(true);
-
+      setErrorMessage('Error al registrarse. Por favor, intenta nuevamente más tarde.');
       console.error(error);
     }
   };
@@ -39,12 +30,7 @@ const LoginPage = () => {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="w-96">
-        <h1 className="text-3xl font-bold mb-4">Iniciar Sesión</h1>
-        {showAlert && (
-          <div className="bg-red-500 text-white p-2 mb-4 rounded-md">
-            {errorMessage}
-          </div>
-        )}
+        <h1 className="text-3xl font-bold mb-4">Registrarse</h1>
         <form className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-600">
@@ -73,26 +59,37 @@ const LoginPage = () => {
             />
           </div>
           <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-600">
+              Teléfono
+            </label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+              className="mt-1 p-2 w-full border rounded-md"
+            />
+          </div>
+          <div>
             <button
               type="button"
-              onClick={handleLogin}
+              onClick={handleRegister}
               className="w-full bg-blue-500 text-white p-2 rounded-md"
             >
-              Iniciar Sesión
+              Registrarse
             </button>
           </div>
           {user && user.email === 'admin@example.com' && user.isAdmin && (
             <div>
-              <Link href="/admin">
-               Acceder a la página del admin
-              </Link>
+              <Link href="/admin">Acceder a la página del admin</Link>
             </div>
           )}
           <div>
             <p>
-              ¿No tienes cuenta?{' '}
-              <Link href="/register">
-                Regístrate aquí
+              ¿Ya tienes cuenta?{' '}
+              <Link href="/login">
+                Inicia sesión aquí
               </Link>
             </p>
           </div>
@@ -102,5 +99,5 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
 

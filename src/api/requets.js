@@ -10,3 +10,8 @@ export const loginRequest = (user) =>
 
 export const verifyTokenRequest = (user) =>
   axios.post(`${API}/verify`, user);
+
+
+
+export const sendMessageRoute = `${API}/api/messages/addmsg`;
+export const recieveMessageRoute = `${API}/api/messages/getmsg`;

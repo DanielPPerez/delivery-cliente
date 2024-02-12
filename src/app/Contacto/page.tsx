@@ -1,63 +1,66 @@
 "use client"
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import { useAuth } from '../../context/datacontext'; // Update the path
 
-const socket = io('http://localhost:4000');
+const socket = io('http://localhost:4000', {
+  withCredentials: true,
+});
 
 const ContactoUsuario: React.FC = () => {
-  const [nombreRepartidor, setNombreRepartidor] = useState('Usuario');
-  const [numeroRepartidor, setNumeroRepartidor] = useState('123456789');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [mensajes, setMensajes] = useState([]);
+  const [activeUsers, setActiveUsers] = useState([]); // Changed to an array
+  const [isConnected, setIsConnected] = useState(false);
+
+  const auth = useAuth(); // Use the authentication context
 
   const enviarMensaje = () => {
     if (nuevoMensaje.trim() !== '') {
-      console.log(`Enviando mensaje: ${nuevoMensaje}`);
-
-      // Modificado para enviar mensajes privados al admin
-      const selectUser = 'admin';
-      socket.emit('sendMessagesPrivate', { selectUser, message: nuevoMensaje });
-
-      // Actualizar el estado para mostrar el mensaje enviado
-      setMensajes([...mensajes, { user: 'Usuario', message: nuevoMensaje }]);
-
+      const userEmail = auth.user ? auth.user.email : 'Usuario'; // Use the user's email if available
+      socket.emit('chat_message', { user: userEmail, message: nuevoMensaje });
+      setMensajes([...mensajes, { user: userEmail, message: nuevoMensaje }]);
       setNuevoMensaje('');
     }
   };
 
   useEffect(() => {
-    // Manejar mensajes privados recibidos
-    socket.on('sendMessage', ({ user, message }) => {
-      console.log(`Mensaje recibido de ${user}: ${message}`);
-      // Actualizar el estado para mostrar el mensaje recibido
-      setMensajes([...mensajes, { user, message }]);
+    socket.on('connect', () => setIsConnected(true));
+
+    socket.on('chat_message', (data) => {
+      setMensajes((prevMessages) => [...prevMessages, data]);
     });
 
-    // Actualizar la lista de usuarios activos
-    socket.on('activeSessions', (users) => {
-      console.log('Lista de usuarios activos:', users);
-      // Puedes realizar acciones según tus necesidades
+    socket.on('connected_users', (data) => {
+      setActiveUsers(data.users || []); // Ensure activeUsers is an array
     });
 
-    // Limpiar suscripciones al desmontar el componente
     return () => {
-      socket.off('sendMessage');
-      socket.off('activeSessions');
+      socket.off('connect');
+      socket.off('chat_message');
+      socket.off('connected_users');
     };
   }, [mensajes]);
 
   return (
     <div className="flex flex-col h-screen">
       <div className="bg-gray-800 text-white p-4">
-        <h2 className="text-xl font-bold">{nombreRepartidor}</h2>
-        <p>{numeroRepartidor}</p>
+        <h2 className="text-xl font-bold">Atencion a clientes</h2>
       </div>
 
       <div className="flex-1 p-4 overflow-y-auto">
         {/* Mostrar los mensajes */}
         {mensajes.map((mensaje, index) => (
-          <div key={index} className="mb-2">
-            <strong>{mensaje.user}:</strong> {mensaje.message}
+          <div key={index} className={`mb-2 ${mensaje.isAdmin ? 'text-right' : ''}`}>
+            {mensaje.isAdmin && mensaje.user === 'admin@example.com' ? (
+              <span className="bg-blue-500 p-2 rounded-md inline-block max-w-2/3 text-white">
+                <strong>{mensaje.user}:</strong> {mensaje.message}
+              </span>
+            ) : (
+              <div>
+                <strong>{mensaje.user}:</strong> {mensaje.message}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -74,8 +77,19 @@ const ContactoUsuario: React.FC = () => {
           Enviar
         </button>
       </div>
+
+      <div className="p-4 bg-gray-200">
+        <h3>Usuarios Activos:</h3>
+        <ul>
+          {activeUsers && activeUsers.map((user) => (
+            <li key={user}>{user}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
 
 export default ContactoUsuario;
+
+
